@@ -43,9 +43,9 @@
 					<target>1.8</target>
 					<cloudHubDeployment>
 						<uri>https://anypoint.mulesoft.com</uri>
-						<muleVersion>4.3.0</muleVersion>
+						<muleVersion>4.4.0</muleVersion>
 						<userName>DubeyA</userName>
-						<password>ABhishek@123</password>
+						<password>Abhishek@123</password>
 						<environment>Sandbox</environment>
 						<applicationName>My-QR</applicationName>
 						<businessGroup>Prolifics</businessGroup>

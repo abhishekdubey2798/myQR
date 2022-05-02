@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:java="http://www.mulesoft.org/schema/mule/java"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/java/current/mule-java.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="a67b58b7-af78-4941-85c5-1338851bad9e" >
+		<http:listener-connection host="0.0.0.0" port="8083" />
+	</http:listener-config>
+	<configuration-properties doc:name="Configuration properties" doc:id="fbb01bbd-7def-44f5-bed0-52ad4a3f2a16" file="config\config.yaml" />
+	<flow name="sample_qrFlow" doc:id="46b36d62-f323-4d97-b7cc-b9561391624f" >
+		<http:listener doc:name="Listener" doc:id="71fbbf64-df8e-4046-82e7-b44ec677090d" config-ref="HTTP_Listener_config" path="/qr"/>
+		<!-- <ee:transform doc:name="Transform Message" doc:id="0278329c-4a24-4f97-818b-7e0fa304072d" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="qrCodeData" ><![CDATA[%dw 2.0
+output text/plain
+-&#45;&#45;
+p('data.qrCodeData')]]></ee:set-variable>
+				<ee:set-variable variableName="filePath" ><![CDATA[%dw 2.0
+output text/plain
+-&#45;&#45;
+p('data.filePath')]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform> -->
+		<ee:transform doc:name="Transform Message" doc:id="1a62fbc0-2d63-4d1b-9297-008ecaee79d5" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="qrCodeData" ><![CDATA[%dw 2.0
+output text/plain
+---
+p('code.qrCodeData')]]></ee:set-variable>
+				<ee:set-variable variableName="filePath" ><![CDATA[%dw 2.0
+output text/plain
+---
+p('code.filePath')]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="bb0e196c-73f0-4db0-b0e3-cfc4fc9a669d" message="data : #[vars.qrCodeData]"/>
+		<java:invoke-static doc:name="Invoke static" doc:id="b13306df-7e2d-46ca-a388-8ed440db3acd" class="com.javapapers.java.QRCode" method="main(java.lang.String,java.lang.String)">
+			<java:args ><![CDATA[#[%dw 2.0
+output application/java
+---
+{
+  qrCodeData: vars.qrCodeData,
+  filePath: vars.filePath
+  
+  
+}]]]></java:args>
+		</java:invoke-static>
+		<set-payload value="QR is generated successfully" doc:name="Set Payload" doc:id="1e684b49-1536-4870-a730-802232f9d3ce" />
+		<!-- <java:invoke-static doc:name="Invoke static" doc:id="3b29ffcf-a13f-48c3-a2e3-8d0772382263" class="com.javapapers.java.decryptQR" method="main(java.lang.String)">
+			<java:args ><![CDATA[#[%dw 2.0
+output application/java
+-&#45;&#45;
+{
+  filePath: vars.filePath 
+}]]]></java:args>
+		</java:invoke-static> -->
+		<!-- <logger level="INFO" doc:name="Logger" doc:id="79ebe8c6-860c-4514-9f2d-7a6ab9e55f77" message="After Decryption"/>
+		<logger level="INFO" doc:name="Logger" doc:id="0950be8a-eb35-4531-9e94-e968e33ef477"/>
+	 --></flow>
+</mule>
